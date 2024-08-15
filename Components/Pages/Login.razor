@@ -1,0 +1,59 @@
+@page "/"
+@inject UserService UserService
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+<PageTitle>Login</PageTitle>
+
+<div class="form-signin mt-xxl-5">
+    @if(loginFailed) {
+        <div class="alert alert-danger" role="alert">
+            Invalid email or password. Please try again.
+        </div>
+    }
+    
+    <EditForm Model="@model" OnValidSubmit="OnValidSubmit" FormName="loginForm" Enhance>
+        <DataAnnotationsValidator />
+        
+        <img class="mb-4" src="images/logo.png" alt="" width="72" height="72">
+        <h1 class="h3 mb-2 font-weight-normal">Please sign in</h1>
+        <p class="mb-3">with <em>email: admin@admin.com</em> and <em>password: password123</em></p>
+
+        <InputText @bind-Value="model.Username" class="form-control mb-4" placeholder="Email" />
+        <ValidationMessage For="@(() => model.Username)" />
+
+        <InputText @bind-Value="model.Password" type="password" class="form-control" placeholder="Password" />
+        <ValidationMessage For="@(() => model.Password)" />
+
+        <div class="checkbox mb-3">
+            <label>
+            <input type="checkbox" value="remember-me"> Remember me
+            </label>
+        </div>
+
+        <button class="btn btn-lg btn-primary btn-block">Sign in</button>
+        <p class="mt-5 mb-3 text-muted">&copy; 2017-2018</p>
+
+    </EditForm>
+</div>
+
+
+
+@code {
+    [SupplyParameterFromForm(FormName = "loginForm")]
+    public Models.Login model {get; set;} = new();
+
+    private bool loginFailed = false;
+
+
+    private void OnValidSubmit() {
+        if(model.Username == "admin@admin.com" && model.Password == "password123") {    
+            UserService.SetUsername(model.Username);
+            NavigationManager.NavigateTo("/dashboard");
+        }else {
+            @* NavigationManager.NavigateTo("/"); *@
+            loginFailed = true;
+
+        }
+    }
+}
